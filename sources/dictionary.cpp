@@ -1,3 +1,6 @@
+#include <algorithm> // sort
+#include <fstream> // ifstream, getline
+#include <iostream>
 #include "dictionary.hpp"
 
 int get_string_score(const std::string &str)
@@ -72,7 +75,7 @@ static bool compareScore(const std::string &a, const std::string &b)
     return (get_string_score(a) > get_string_score(b));
 }
 
-Dictionnary::Dictionnary(const std::string &filename, const bool &bonus)
+Dictionnary::Dictionnary(const std::string &filename, bool bonus)
 {
     std::string line;
     std::ifstream myfile(filename);
@@ -90,15 +93,17 @@ Dictionnary::Dictionnary(const std::string &filename, const bool &bonus)
     else
         std::cerr << "Impossible d'ouvrir le fichier " << filename << std::endl;
 }
-Dictionnary::~Dictionnary()
-{
-}
 
 void Dictionnary::print_solution()
 {
-    std::cout << "Voici la liste des mots issues de la recherche dans le dictionnaire." << std::endl;
-    for (auto word : solution)
-        std::cout << word << " (" << word.size() << ") lettres et " << get_string_score(word) << " points" << std::endl;
+  if (solution.size() == 0)
+    {
+      std::cout << "Aucun mot n'a été trouvé" << std::endl;
+      return;
+    }
+  std::cout << "Voici la liste des mots issus de la recherche dans le dictionnaire." << std::endl;
+  for (auto word : solution)
+    std::cout << word << " " << word.size() << " lettres et " << get_string_score(word) << " points" << std::endl;
 }
 
 void Dictionnary::get_longest_word(const std::string &word)
@@ -111,18 +116,16 @@ void Dictionnary::get_longest_word(const std::string &word)
         if (is_a_solution)
         {
             solution.push_back(wd);
-            if ((solution.size() == 10))
-            {
-                std::cout << count << " essais ont été effectués pour trouver la solution" << std::endl;
-                return;
-            }
         }
         count += 1;
+	if (solution.size() == 1) // puisque le dictionnaire est trié, les solutions le sont aussi. limites a augmenter pour trouver plus de solutions :)
+	  break;
     }
+    std::cout << count << " essais ont été effectués pour trouver le mot solution : " << solution[0] << std::endl;
     return;
 }
 
-void Dictionnary::delete_used_letter(std::string &word, const char &c)
+void Dictionnary::delete_used_letter(std::string &word, char c)
 {
     std::string str;
     bool deleted = false;

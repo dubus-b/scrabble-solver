@@ -1,6 +1,7 @@
+#include <iostream>
 #include "dictionary.hpp"
 
-void menu(int &choice)
+static void menu(int &choice)
 {
   std::cout << "Voulez-vous obtenir le mot le plus long ou le mot valant le maximum de point au Scrabble ?"
             << std::endl
@@ -10,41 +11,40 @@ void menu(int &choice)
   std::cin >> choice;
   std::cin.clear();
   std::cin.ignore(1);
-  if(std::cin.eof())
+  if (std::cin.eof())
     choice = -1;
   if (choice != 1 && choice != 2 && choice != -1)
   {
         std::cerr << "Erreur : Veuillez réessayer" << std::endl;
-        menu(choice);
+        menu(choice); // reference hack ;)
   }
   return;
 }
 
-int main(int argc, char **argv)
+int	main(int argc, char **argv)
 {
   Dictionnary *dict;
-  int choice;
+  int choice = 0;
   std::string solution;
   std::string word;
   if (argc < 2)
   {
     std::cout << "Usage : " << argv[0] << " dictionnaire" << std::endl;
-    return 0;
+    return 1;
   }
+  menu(choice);
+  if (choice == 1)
+    dict = new Dictionnary(argv[1], false);
+  else if (choice == 2)
+    dict = new Dictionnary(argv[1], true);
   else
-  {
-    menu(choice);
-    if (choice == 1)
-      dict = new Dictionnary(argv[1], false);
-    else if (choice == 2)
-      dict = new Dictionnary(argv[1], true);
-    else
-      return 0; // End of file
-    std::cout << "Entrez le mot a tester : " << std::endl;
-    std::cin >> word;
-    dict->get_longest_word(word);
-    dict->print_solution();
-    delete dict;
-    return 0;
-  }
+    return 0; // End of file
+  std::cout << "Entrez le mot a tester : " << std::endl;
+  std::cin >> word;
+  if (std::cin.eof())
+    return 2;
+  dict->get_longest_word(word);
+  dict->print_solution();
+  delete dict;
+  return 0;
 }
